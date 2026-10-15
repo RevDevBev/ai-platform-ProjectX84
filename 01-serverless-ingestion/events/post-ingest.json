@@ -1,0 +1,16 @@
+{
+  "version": "2.0",
+  "routeKey": "POST /ingest",
+  "rawPath": "/ingest",
+  "headers": {
+    "content-type": "application/json"
+  },
+  "requestContext": {
+    "http": {
+      "method": "POST",
+      "path": "/ingest"
+    }
+  },
+  "body": "{\"name\": \"test\"}",
+  "isBase64Encoded": false
+}
