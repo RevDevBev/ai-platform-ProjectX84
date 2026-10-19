@@ -11,6 +11,15 @@ terraform {
       version = "~> 2.0"
     }
   }
+
+  backend "s3" {
+    bucket = "tfstate-hamzah-48271"
+    key = "serverless-ingestion/dev/terraform.tfstate"
+    region = "eu-north-1"
+    profile = "Touch Grass Later"
+    encrypt = true
+    use_lockfile = true
+  }
 }
 
 provider "aws" {
