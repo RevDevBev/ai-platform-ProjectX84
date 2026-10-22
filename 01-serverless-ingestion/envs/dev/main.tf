@@ -1,8 +1,8 @@
 module "ingest_pipeline" {
-  source             = "../../modules/ingest-pipeline"
-  environment        = "dev"
-  consumer_timeout   = 30
-  lambda_source_file = "${path.module}/../../lambda_function.py"
+  source               = "../../modules/ingest-pipeline"
+  environment          = "dev"
+  consumer_timeout     = 30
+  consumer_source_file = "${path.module}/../../consumer.py"
 }
 
 

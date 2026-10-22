@@ -17,3 +17,7 @@ output "table_name" {
 output "table_arn" {
   value = aws_dynamodb_table.messages.arn
 }
+
+output "consumer_function_name" {
+  value = aws_lambda_function.consumer.function_name
+}
