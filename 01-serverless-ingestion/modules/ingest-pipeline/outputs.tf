@@ -21,3 +21,7 @@ output "table_arn" {
 output "consumer_function_name" {
   value = aws_lambda_function.consumer.function_name
 }
+
+output "invoke_url" {
+  value = "${aws_apigatewayv2_stage.default.invoke_url}ingest"
+}

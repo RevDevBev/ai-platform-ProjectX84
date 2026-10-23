@@ -13,6 +13,68 @@ resource "aws_sqs_queue" "dlq" {
   tags                      = local.tags
 }
 
+resource "aws_apigatewayv2_api" "ingest" {
+  name = "${local.name}-api"
+  protocol_type = "HTTP"
+  tags = local.tags
+}
+
+resource "aws_apigatewayv2_integration" "sqs" {
+  api_id = aws_apigatewayv2_api.ingest.id
+  integration_type = "AWS_PROXY"
+  integration_subtype = "SQS-SendMessage"
+  credentials_arn = aws_iam_role.apigw_sqs.arn
+  payload_format_version = "1.0"
+  
+  request_parameters = {
+    QueueUrl = aws_sqs_queue.main.url
+    MessageBody = "$request.body"
+  }
+}
+
+resource "aws_apigatewayv2_route" "post_ingest" {
+  api_id = aws_apigatewayv2_api.ingest.id
+  route_key = "POST /ingest"
+  target = "integrations/${aws_apigatewayv2_integration.sqs.id}"
+}
+
+resource "aws_apigatewayv2_stage" "default" {
+  api_id = aws_apigatewayv2_api.ingest.id
+  name = "$default"
+  auto_deploy = true
+  tags = local.tags
+}
+
+data "aws_iam_policy_document" "apigw_assume" {
+  statement {
+    actions = ["sts:AssumeRole"]
+    principals {
+      type = "Service"
+      identifiers = ["apigateway.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "apigw_sqs" {
+  name = "${local.name}-apigw-sqs-role"
+  assume_role_policy = data.aws_iam_policy_document.apigw_assume.json
+  tags = local.tags
+}
+
+data "aws_iam_policy_document" "apigw_sqs" {
+  statement {
+    actions = ["sqs:SendMessage"]
+    resources = [aws_sqs_queue.main.arn]
+  }
+}
+
+resource "aws_iam_role_policy" "apigw_sqs" {
+  name = "send-to-queue"
+  role = aws_iam_role.apigw_sqs.id
+  policy = data.aws_iam_policy_document.apigw_sqs.json
+}
+  
+
 resource "aws_sqs_queue" "main" {
   name                       = "${local.name}-queue"
   visibility_timeout_seconds = var.consumer_timeout * 6

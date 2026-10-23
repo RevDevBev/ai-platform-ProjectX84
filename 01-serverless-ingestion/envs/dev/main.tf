@@ -14,3 +14,7 @@ output "queue_url" {
 output "table_name" {
   value = module.ingest_pipeline.table_name
 }
+
+output "pipeline_invoke_url" {
+  value = module.ingest_pipeline.invoke_url
+}
