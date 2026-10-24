@@ -1,0 +1,31 @@
+name: terraform-ci
+
+on:
+  pull_request:
+    paths:
+      - "01-serverless-ingestion/**"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.16.5"
+
+      - name: Format check
+        run: terraform fmt -check -recursive
+        working-directory: 01-serverless-ingestion
+
+      - name: Init (no backend)
+        run: terraform init -backend=false
+        working-directory: 01-serverless-ingestion/envs/dev
+
+      - name: Validate
+        run: terraform validate
+        working-directory: 01-serverless-ingestion/envs/dev
