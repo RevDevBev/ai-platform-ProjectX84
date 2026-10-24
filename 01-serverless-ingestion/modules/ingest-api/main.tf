@@ -4,7 +4,7 @@ locals {
     Environment = var.environment
     Project     = "ai-platform"
   }
-}
+} 
 
 data "aws_iam_policy_document" "lambda_assume" {
   statement {
