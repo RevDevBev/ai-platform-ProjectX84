@@ -3,7 +3,7 @@ module "ingest_pipeline" {
   environment          = "dev"
   consumer_timeout     = 30
   consumer_source_file = "${path.module}/../../consumer.py"
-  batch_size = 3
+  batch_size           = 3
 }
 
 
