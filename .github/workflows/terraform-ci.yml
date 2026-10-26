@@ -81,4 +81,4 @@ jobs:
         run: >
           checkov -d 01-serverless-ingestion
           --framework terraform
-          --compact --quiet --soft-fail
+          --compact --quiet --soft-fail 
