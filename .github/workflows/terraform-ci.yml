@@ -64,11 +64,6 @@ jobs:
             echo '~~~'
             cat plan.txt 2>/dev/null || echo "no plan output"
             echo '~~~'
-<<<<<<< HEAD
-          } >> "$GITHUB_STEP_SUMMARY"
-=======
-          } >> "$GITHUB_STEP_SUMMARY"
-          
   security-scan:
     runs-on: ubuntu-24.04
     steps:
@@ -86,4 +81,3 @@ jobs:
           checkov -d 01-serverless-ingestion
           --framework terraform
           --compact --quiet --soft-fail
->>>>>>> ci-deploy
