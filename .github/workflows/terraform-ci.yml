@@ -65,3 +65,21 @@ jobs:
             cat plan.txt 2>/dev/null || echo "no plan output"
             echo '~~~'
           } >> "$GITHUB_STEP_SUMMARY"
+          
+  security-scan:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Checkov
+        run: pip install checkov
+
+      - name: Scan Terraform
+        run: >
+          checkov -d 01-serverless-ingestion
+          --framework terraform
+          --compact --quiet --soft-fail
