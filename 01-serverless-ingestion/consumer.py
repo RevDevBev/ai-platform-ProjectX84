@@ -7,7 +7,7 @@ from botocore.exceptions import ClientError
 
 table = boto3.resource("dynamodb").Table(os.environ["TABLE_NAME"])
 
-
+#lambda function code
 def lambda_handler(event, context):
     failures = []
 
