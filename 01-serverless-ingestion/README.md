@@ -65,3 +65,38 @@ block in `envs/dev/versions.tf`).
 - Separate AWS accounts and state per environment (test, prod)
 - A CI/CD pipeline (plan on PR, gated deploy)
 - Request validation at the API so bad input is rejected with a 400
+
+
+## CI/CD pipeline (GitHub Actions)
+
+```mermaid
+flowchart LR
+  PR[Pull request] --> V[validate: fmt + validate]
+  PR --> S[security scan: Checkov]
+  V --> P[plan: read-only key]
+  PR -->|merge to main| D[deploy dev]
+  D --> PP[plan prod]
+  PP --> G{prod gate}
+  G --> DP[deploy prod]
+```
+
+| Stage | Trigger | Credentials | Purpose |
+|---|---|---|---|
+| validate | every PR | none | formatting and configuration errors |
+| security scan | every PR | none | insecure settings (advisory, soft-fail) |
+| plan | PR, after validate | read-only user | show reviewers exactly what will change |
+| deploy dev | merge to main | dev apply user (environment secret) | automatic, serialized deploy |
+| deploy prod | after dev succeeds | prod apply user (environment secret) | <state the gate you actually have: approval, or manual dispatch> |
+
+### Decisions and trade-offs
+- **No OIDC:** my AWS account is on the Free plan, and an organization policy blocked creating the GitHub OIDC provider. I used three scoped IAM users instead, with keys stored as GitHub secrets, created in the console so they never enter Terraform state.
+- **Separate credentials per job type and per environment:** plan is read-only, dev and prod have separate apply users limited to their own role-name prefix and state path.
+- **Serialized deploys** with `concurrency` and no cancel-in-progress, so two applies never race on one state.
+- **Tested failures:** bad formatting and an invalid argument are stopped before plan, and a blocking scan fails the PR.
+
+### What I'd change in production
+- OIDC with short-lived credentials instead of stored keys
+- Separate AWS accounts for dev, test and prod
+- Required reviewers on prod, branch protection with required checks
+- Save the plan and apply that exact file
+- Scan findings triaged, then made blocking
