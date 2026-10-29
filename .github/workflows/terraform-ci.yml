@@ -1,0 +1,85 @@
+name: terraform-ci
+
+on:
+  pull_request:
+    paths:
+      - "01-serverless-ingestion/**"
+      - ".github/workflows/terraform-ci.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.16.5"
+
+      - name: Format check
+        run: terraform fmt -check -recursive
+        working-directory: 01-serverless-ingestion
+
+      - name: Init (no backend)
+        run: terraform init -backend=false
+        working-directory: 01-serverless-ingestion/envs/dev
+
+      - name: Validate
+        run: terraform validate
+        working-directory: 01-serverless-ingestion/envs/dev
+
+  plan:
+    needs: validate
+    runs-on: ubuntu-24.04
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_PLAN_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_PLAN_SECRET_ACCESS_KEY }}
+      AWS_REGION: eu-north-1
+    defaults:
+      run:
+        working-directory: 01-serverless-ingestion/envs/dev
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.16.5"
+
+      - name: Init
+        run: terraform init -input=false
+
+      - name: Plan
+        run: |
+          set -o pipefail
+          terraform plan -input=false -lock=false -no-color | tee plan.txt
+
+      - name: Show plan in job summary
+        if: always()
+        run: |
+          {
+            echo "### Terraform plan (envs/dev)"
+            echo '~~~'
+            cat plan.txt 2>/dev/null || echo "no plan output"
+            echo '~~~'
+          } >> "$GITHUB_STEP_SUMMARY"
+          
+  security-scan:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Checkov
+        run: pip install checkov
+
+      - name: Scan Terraform
+        run: >
+          checkov -d 01-serverless-ingestion
+          --framework terraform
+          --compact --quiet --soft-fail
