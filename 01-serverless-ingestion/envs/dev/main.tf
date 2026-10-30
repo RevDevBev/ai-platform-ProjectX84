@@ -4,7 +4,6 @@ module "ingest_pipeline" {
   consumer_timeout     = 30
   consumer_source_file = "${path.module}/../../consumer.py"
   batch_size           = 3
-    not_a_real_setting = "oops"
 }
 
 
