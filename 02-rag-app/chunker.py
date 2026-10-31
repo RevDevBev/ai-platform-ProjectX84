@@ -4,7 +4,7 @@ from pathlib import Path
 
 DATA_DIR = Path(__file__).parent / "data"
 OUT_FILE = Path(__file__).parent / "chunks.json"
-MAX_CHARS = 800
+MAX_CHARS = 150
 OVERLAP = 120
 
 
