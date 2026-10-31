@@ -6,8 +6,6 @@ module "ingest_pipeline" {
   batch_size           = 3
 }
 
-
-
 output "queue_url" {
   value = module.ingest_pipeline.queue_url
 }
