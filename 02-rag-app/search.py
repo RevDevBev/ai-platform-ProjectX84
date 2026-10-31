@@ -41,7 +41,7 @@ if __name__ == "__main__":
         unsorted_scores.append(score)
         unsorted_ids.append(i)
 
-    print("\nReranking the top passages using a cross-encoder ...\n")    
+    print("\nReranking the top passages using a cross-encoder  ...\n")    
 
     for i in reranker(question, unsorted_chunks):
         print(f"{unsorted_scores[i]:.3f}  {chunks[unsorted_ids[i]]['id']}  [{chunks[unsorted_ids[i]]['section']}]  ({chunks[unsorted_ids[i]]['access']})")
