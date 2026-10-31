@@ -1,5 +1,6 @@
 import numpy as np
 from fastembed import TextEmbedding
+from fastembed.rerank.cross_encoder import TextCrossEncoder
 
 MODEL_NAME = "BAAI/bge-small-en-v1.5"
 QUERY_PREFIX = "Represent this sentence for searching relevant passages: "
