@@ -16,7 +16,7 @@ def lambda_handler(event, context):
         try:
             payload = json.loads(record["body"])
             table.put_item(
-                Item={
+                Item={ 
                     "message_id": message_id,
                     "payload": json.dumps(payload),
                     "receive_count": int(record["attributes"]["ApproximateReceiveCount"]),
