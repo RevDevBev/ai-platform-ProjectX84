@@ -1,5 +1,9 @@
 # Local .terraform directories
 .terraform/
+.venv/
+chunks.json
+index.npz
+__pycache__/
 
 # .tfstate files
 *.tfstate
