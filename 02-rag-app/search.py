@@ -5,7 +5,6 @@ from pathlib import Path
 import numpy as np
 
 from embedder import embed_query
-from reranker import rerank
 
 HERE = Path(__file__).parent
 CANDIDATES = 20
@@ -24,6 +23,8 @@ def search(query, chunks, vectors, k=3):
 
 
 if __name__ == "__main__":
+    from reranker import rerank
+
     question = " ".join(sys.argv[1:]) or "What happens to a message that fails three times?"
     chunks, vectors = load_index()
     candidates = search(question, chunks, vectors, k=min(CANDIDATES, len(chunks)))
@@ -38,4 +39,3 @@ if __name__ == "__main__":
             f"{rr_score:7.3f}  (was {first_score:.3f})  "
             f"{chunk['id']}  [{chunk['section']}]  ({chunk['access']})"
         )
-        print("       " + chunk["text"].replace("\n", " ")[:110] + "...")
