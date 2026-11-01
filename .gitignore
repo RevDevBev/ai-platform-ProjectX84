@@ -4,6 +4,7 @@
 chunks.json
 index.npz
 __pycache__/
+logs/
 
 # .tfstate files
 *.tfstate

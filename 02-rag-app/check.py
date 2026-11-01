@@ -1,3 +1,4 @@
+from reranker import rerank
 from search import load_index, search
 
 CASES = [
@@ -10,10 +11,17 @@ CASES = [
 ]
 
 chunks, vectors = load_index()
-hit1 = hit3 = 0
+before1 = after1 = before3 = after3 = 0
 for question, expected in CASES:
-    ids = [c["id"] for _, c in search(question, chunks, vectors, k=3)]
-    hit1 += ids[0] == expected
-    hit3 += expected in ids
-    print(("OK  " if ids[0] == expected else "MISS"), question, "->", ids)
-print(f"hit@1 {hit1}/{len(CASES)}   hit@3 {hit3}/{len(CASES)}")
+    first = search(question, chunks, vectors, k=min(20, len(chunks)))
+    ids_before = [c["id"] for _, c in first[:3]]
+    ids_after = [c["id"] for _, _, c in rerank(question, first, top_n=3)]
+    before1 += ids_before[0] == expected
+    after1 += ids_after[0] == expected
+    before3 += expected in ids_before
+    after3 += expected in ids_after
+    print(question, "\n   before:", ids_before, "\n   after: ", ids_after)
+
+n = len(CASES)
+print(f"\nhit@1  before {before1}/{n}  after {after1}/{n}")
+print(f"hit@3  before {before3}/{n}  after {after3}/{n}")
