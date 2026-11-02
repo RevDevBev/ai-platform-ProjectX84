@@ -1,0 +1,16 @@
+[
+  {"q": "What does ERR-4291 mean?", "expected": ["api-reference.md > Response codes"]},
+  {"q": "What caused INC-2217?", "expected": ["incident-2026-09-14.md > Root cause"]},
+  {"q": "What is the rate limit for POST /ingest?", "expected": ["api-reference.md > Rate limits"]},
+  {"q": "Why do clients receive HTTP 429?", "expected": ["api-reference.md > Rate limits", "api-reference.md > Response codes"]},
+  {"q": "How long do we keep items in DynamoDB?", "expected": ["data-retention.md > Retention periods"]},
+  {"q": "How long are messages kept in the dead-letter queue?", "expected": ["data-retention.md > Retention periods", "runbook-dlq.md > Detection"]},
+  {"q": "How do I resend messages that failed?", "expected": ["runbook-dlq.md > Recovery", "faq.md > Resending failed messages"]},
+  {"q": "Why does my message seem to have vanished?", "expected": ["faq.md > Why was my message not processed?"]},
+  {"q": "How do I get access to the platform?", "expected": ["onboarding-guide.md > Getting access"]},
+  {"q": "How do I set up my laptop for development?", "expected": ["onboarding-guide.md > Local setup"]},
+  {"q": "What is the monthly cloud budget?", "expected": ["cost-and-budgets.md > Monthly budget"]},
+  {"q": "How are duplicate messages prevented?", "expected": ["architecture-overview.md > Duplicate deliveries"]},
+  {"q": "Who may read stored personal data?", "expected": ["data-retention.md > Access to personal data"]},
+  {"q": "How often are the CI keys rotated?", "expected": ["access-and-security.md > CI credentials"]}
+]
