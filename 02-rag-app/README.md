@@ -46,9 +46,9 @@ flowchart LR
 |---|---|---|---|
 | Vector (bge-small) | 11/14 | 13/14 | 0.871 |
 | Vector + cross-encoder rerank | 13/14 | 14/14 | 0.964 |
-| BM25 | (Day 6, Hour 2) | | |
-| Hybrid (BM25 + vector, RRF) | (Day 6, Hour 3) | | |
-| Hybrid + rerank | (Day 6, Hour 5) | | |
+| BM25 | 11/14 | 12/15 | 0.821 |
+| Hybrid (BM25 + vector, RRF) | 13/14 | 14/14 | 0.964
+| Hybrid + rerank | 13/14 | 14/14 | 0.964
 
 **What the misses show:** <one or two sentences, in your own words. For example:
 which questions failed, and whether the cause was an exact term, a paraphrase,
