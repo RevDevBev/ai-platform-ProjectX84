@@ -3,6 +3,7 @@ from pathlib import Path
 
 from reranker import rerank
 from search import load_index, search
+from hybrid_search import hybrid
 
 HERE = Path(__file__).parent
 QUESTIONS = json.loads((HERE / "eval" / "questions.json").read_text(encoding="utf-8"))
@@ -13,6 +14,14 @@ from bm25_search import BM25Index
 
 bm25_index = BM25Index(chunks)
 
+def hybrid_only(question, k=10):
+    return [c for _s, c, _v, _b in hybrid(question, chunks, vectors, bm25_index, top_n=k)]
+
+
+def hybrid_rerank(question, k=10):
+    fused = hybrid(question, chunks, vectors, bm25_index, top_n=20)
+    candidates = [(s, c) for s, c, _v, _b in fused]
+    return [c for _rr, _f, c in rerank(question, candidates, top_n=k)]
 
 def bm25_only(question, k=10):
     return [c for _s, c in bm25_index.search(question, k=k)]
@@ -33,7 +42,9 @@ def vector_rerank(question, k=10):
 RETRIEVERS = {
     "vector": vector_only,
     "bm25": bm25_only,
+    "hybrid": hybrid_only,
     "vector+rerank": vector_rerank,
+    "hybrid+rerank": hybrid_rerank,
 }
 
 def evaluate(name, fn, verbose=True):
