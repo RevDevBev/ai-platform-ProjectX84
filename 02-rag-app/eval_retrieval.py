@@ -9,6 +9,13 @@ QUESTIONS = json.loads((HERE / "eval" / "questions.json").read_text(encoding="ut
 
 chunks, vectors = load_index()
 
+from bm25_search import BM25Index
+
+bm25_index = BM25Index(chunks)
+
+
+def bm25_only(question, k=10):
+    return [c for _s, c in bm25_index.search(question, k=k)]
 
 def label(chunk):
     return f"{chunk['source']} > {chunk['section']}"
@@ -23,8 +30,11 @@ def vector_rerank(question, k=10):
     return [c for _rr, _f, c in rerank(question, candidates, top_n=k)]
 
 
-RETRIEVERS = {"vector": vector_only, "vector+rerank": vector_rerank}
-
+RETRIEVERS = {
+    "vector": vector_only,
+    "bm25": bm25_only,
+    "vector+rerank": vector_rerank,
+}
 
 def evaluate(name, fn, verbose=True):
     hit1 = hit3 = 0
