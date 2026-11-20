@@ -5,37 +5,40 @@ from reranker import rerank
 from search import load_index, search
 from hybrid_search import hybrid
 
+
 HERE = Path(__file__).parent
 QUESTIONS = json.loads((HERE / "eval" / "questions.json").read_text(encoding="utf-8"))
+EVAL_LEVEL = "restricted"
 
 chunks, vectors = load_index()
 
 from bm25_search import BM25Index
 
-bm25_index = BM25Index(chunks)
+#bm25_index = BM25Index(chunks)
 
 def hybrid_only(question, k=10):
-    return [c for _s, c, _v, _b in hybrid(question, chunks, vectors, bm25_index, top_n=k)]
+    return [c for _s, c, _v, _b in hybrid(question, chunks, vectors, EVAL_LEVEL, top_n=k)]
 
 
 def hybrid_rerank(question, k=10):
-    fused = hybrid(question, chunks, vectors, bm25_index, top_n=20)
+    fused = hybrid(question, chunks, vectors, EVAL_LEVEL, top_n=20)
     candidates = [(s, c) for s, c, _v, _b in fused]
     return [c for _rr, _f, c in rerank(question, candidates, top_n=k)]
 
 def bm25_only(question, k=10):
-    return [c for _s, c in bm25_index.search(question, k=k)]
+    #return [c for _s, c in bm25_index.search(question, k=k)]
+    return [c for _s, c in BM25Index(chunks).search(question, k=k)]
 
 def label(chunk):
     return f"{chunk['source']} > {chunk['section']}"
 
 
 def vector_only(question, k=10):
-    return [c for _s, c in search(question, chunks, vectors, k=k)]
+    return [c for _s, c in search(question, chunks, vectors, k=k,user_level=EVAL_LEVEL)]
 
 
 def vector_rerank(question, k=10):
-    candidates = search(question, chunks, vectors, k=min(20, len(chunks)))
+    candidates = search(question, chunks, vectors, k=min(20, len(chunks)),user_level=EVAL_LEVEL)
     return [c for _rr, _f, c in rerank(question, candidates, top_n=k)]
 
 

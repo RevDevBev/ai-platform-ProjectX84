@@ -1,9 +1,11 @@
 import json
+import os
 import sys
 from pathlib import Path
 
 import numpy as np
 
+from access import allowed_mask, masked_top_k
 from embedder import embed_query
 
 HERE = Path(__file__).parent
@@ -16,19 +18,23 @@ def load_index():
     return chunks, vectors
 
 
-def search(query, chunks, vectors, k=3):
-    scores = vectors @ embed_query(query)
-    top = np.argsort(scores)[::-1][:k]
-    return [(float(scores[i]), chunks[i]) for i in top]
+def search(query, chunks, vectors, k=3, *, user_level):
+    scores = vectors @embed_query(query)
+    mask = allowed_mask(chunks, user_level)
+    
+    #mask = np.ones(len(chunks), dtype=bool)
+    return [(float(scores[i]), chunks[i]) for i in masked_top_k(scores, mask, k)]
 
 
 if __name__ == "__main__":
     from reranker import rerank
 
+    level = os.environ.get("RAembed_queryG_USER_LEVEL", "public")
     question = " ".join(sys.argv[1:]) or "What happens to a message that fails three times?"
     chunks, vectors = load_index()
-    candidates = search(question, chunks, vectors, k=min(CANDIDATES, len(chunks)))
+    candidates = search(question, chunks, vectors, k=min(CANDIDATES, len(chunks)), user_level=level)
 
+    print(f"User level: {level}\n")
     print("First stage (embedding similarity), top 3:")
     for score, chunk in candidates[:3]:
         print(f"{score:.3f}  {chunk['id']}  [{chunk['section']}]  ({chunk['access']})")

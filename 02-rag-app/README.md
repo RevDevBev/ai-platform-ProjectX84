@@ -58,6 +58,23 @@ a vaguely worded chunk, or an ambiguous question.>
 - MRR: the average of 1/rank of the first correct chunk, so it rewards ranking
   the right answer higher, not only finding it.
 
+## Access control
+- Each document carries an `access` label (public, internal, restricted). Chunks
+  inherit it, and the label is checked **before** any ranking, so restricted text
+  never reaches the reranker or the model.
+- Unknown or missing labels are treated as restricted, and an unknown user level
+  gets public access (fail closed).
+- BM25 indexes are built per level from visible chunks only, so word statistics
+  don't leak.
+- A refusal looks the same whether the answer is restricted or absent.
+- `eval_access.py` checks every question at every level: leaks <0>; questions
+  answerable at public / internal / restricted: 8 / 11 / 14 of <14>.
+
+Limits: access is a single three-level hierarchy and the level comes from an
+environment variable. A real system would use the user's identity and group
+membership, with ACLs synced from the source systems, and would apply the same
+filter inside the vector database.
+
 ## Answer behaviour (refusal and grounding)
 
 | Question type | Behaviour |
