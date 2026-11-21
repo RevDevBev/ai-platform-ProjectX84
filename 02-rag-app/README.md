@@ -95,6 +95,13 @@ filter inside the vector database.
   decision, citations, answer, latency), so a wrong answer can be diagnosed as
   a retrieval problem or a generation problem.
 
+### Decision: retrieval setup
+- Compared vector, BM25, hybrid (RRF), vector+rerank and hybrid+rerank on 14 labelled questions.
+- <what you found: which method led on which question type, with the numbers>
+- Differences vs vector were <distinguishable / not distinguishable> (bootstrap 95% interval).
+- Chosen: <setup>, because <quality, simplicity, latency>.
+- Caveat: the choice was made on the same 14 questions I used while building, so it is optimistic. Day 7 adds a held-out split.
+
 ## Design decisions and trade-offs
 - **Local embeddings and a NumPy index:** my AWS account's Bedrock access was
   still being verified, and a local setup kept the project working. Embedding
