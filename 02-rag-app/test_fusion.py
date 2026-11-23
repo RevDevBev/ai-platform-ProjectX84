@@ -10,10 +10,10 @@ def chunk(i):
 class FusionTests(unittest.TestCase):
     def test_agreement_beats_a_single_list_win(self):
         a = [chunk("x"), chunk("y"), chunk("z")]
-        #b = [chunk("y"), chunk("w")]
-        #fused = rrf([a, b])
+        b = [chunk("y"), chunk("w")]
+        fused = rrf([a, b])
         # y is rank 2 + rank 1, x is rank 1 in one list only
-        #self.assertEqual(fused[0][1]["id"], "y")
+        self.assertEqual(fused[0][1]["id"], "y")
 
     def test_item_in_only_one_list_still_appears(self):
         fused = rrf([[chunk("x")], [chunk("w")]])

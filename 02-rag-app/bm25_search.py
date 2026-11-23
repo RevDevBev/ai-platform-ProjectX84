@@ -29,7 +29,8 @@ class BM25:
         self.k1, self.b = k1, b
         self.tf = [Counter(d) for d in docs_tokens]
         self.lengths = [len(d) for d in docs_tokens]
-        self.avg_len = sum(self.lengths) / len(self.lengths)
+        #self.avg_len = sum(self.lengths) / len(self.lengths)
+        self.avg_len = sum(self.lengths) / len(self.lengths) if self.lengths else 0.0
         df = Counter()
         for d in docs_tokens:
             df.update(set(d))

@@ -1,3 +1,4 @@
+import os
 import json
 import re
 import sys
@@ -5,11 +6,14 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
+
 from config import CANDIDATES, REFUSAL_TEXT, REFUSAL_THRESHOLD, TOP_N
 from generator import BACKEND, generate
-from reranker import rerank
-from search import load_index, search
+from search import load_index
+from retrieve import MODE, retrieve
 
+
+USER_LEVEL = os.environ.get("RAG_USER_LEVEL", "public")
 CITATION = re.compile(r"\[([\w\-]+#\d+)\]")
 LOG_FILE = Path(__file__).parent / "logs" / "queries.jsonl"
 
@@ -20,11 +24,15 @@ def log_event(event):
         f.write(json.dumps(event) + "\n")
 
 
-def ask(question):
+def ask(question, user_level=None):
+    level = user_level or USER_LEVEL
     started = time.perf_counter()
     chunks, vectors = load_index()
-    candidates = search(question, chunks, vectors, k=min(CANDIDATES, len(chunks)))
-    ranked = rerank(question, candidates, top_n=TOP_N)  # (rerank, first_stage, chunk)
+    
+    ranked = retrieve(question, chunks, vectors, level, top_n=TOP_N, pool=min(CANDIDATES, len(chunks)))
+    
+    #candidates = search(question, chunks, vectors, k=min(CANDIDATES, len(chunks)), user_level=level)
+    #ranked = rerank(question, candidates, top_n=TOP_N)  # (rerank, first_stage, chunk)
     top_score = ranked[0][0] if ranked else None
 
     if top_score is None or top_score < REFUSAL_THRESHOLD:
@@ -51,6 +59,7 @@ def ask(question):
         {
             "ts": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "question": question,
+            "user_level": level,
             "decision": decision,
             "generator": BACKEND,
             "threshold": REFUSAL_THRESHOLD,
@@ -67,6 +76,8 @@ def ask(question):
             "bad_citations": result["bad_citations"],
             "answer": answer,
             "latency_ms": round((time.perf_counter() - started) * 1000),
+            "retriever": MODE,
+            
         }
     )
     return result

@@ -22,7 +22,7 @@ chunks, vectors = load_index()
 
 
 def top_scores(question):
-    first = search(question, chunks, vectors, k=min(20, len(chunks)))
+    first = search(question, chunks, vectors, k=min(20, len(chunks)), user_level="restricted")
     ranked = rerank(question, first, top_n=1)
     return ranked[0][0], first[0][0]
 

@@ -13,7 +13,7 @@ CASES = [
 chunks, vectors = load_index()
 before1 = after1 = before3 = after3 = 0
 for question, expected in CASES:
-    first = search(question, chunks, vectors, k=min(20, len(chunks)))
+    first = search(question, chunks, vectors, k=min(20, len(chunks)), user_level="restricted")
     ids_before = [c["id"] for _, c in first[:3]]
     ids_after = [c["id"] for _, _, c in rerank(question, first, top_n=3)]
     before1 += ids_before[0] == expected
