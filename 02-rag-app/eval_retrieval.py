@@ -110,6 +110,7 @@ if __name__ == "__main__":
         cells = " ".join(f"{sum(table[n]['ranks'][i] == 1 for i in idx):>6}" for n in RETRIEVERS)
         print(f"{t:11} {len(idx):>3} {cells}")
 
+    
     print("\nMRR difference vs vector (bootstrap, 95% interval)")
     base = recip(table["vector"]["ranks"])
     for name in RETRIEVERS:
@@ -119,3 +120,4 @@ if __name__ == "__main__":
         lo, hi = bootstrap_interval(diffs)
         verdict = "distinguishable" if lo > 0 or hi < 0 else "not distinguishable"
         print(f"{name:15} {sum(diffs) / len(diffs):+.3f}  [{lo:+.3f}, {hi:+.3f}]  {verdict}")
+  
